@@ -20,6 +20,7 @@ class BaseTask(object):
         self.wait()
 
     def gene(self):
+        self.on_start()
         ptasks = []
         for p in self.parents:
             ptasks.append(p(**self.pconfig.get(p, {})).start())
@@ -33,6 +34,12 @@ class BaseTask(object):
                 else:
                     nexttasks.append(t)
             ptasks = nexttasks
+        for t in self.current_task():
+            yield t
+        self.on_close()
+
+    def current_task(self):
+        return iter([])
 
     def start(self):
         if self.done:
@@ -45,15 +52,25 @@ class BaseTask(object):
         for t in self.tasks:
             pass
 
+    def on_start(self):
+        pass
+
+    def on_close(self):
+        pass
+
 
 class BaseBlockingTask(BaseTask):
 
     def gene(self):
+        self.on_start()
         for p in self.parents:
             t = p(**self.pconfig.get(p, {}))
             t.start()
             t.wait()
             yield t
+        for t in self.current_task():
+            yield t
+        self.on_close()
 
 
 class BaseCommandTask(BaseTask):
@@ -61,10 +78,8 @@ class BaseCommandTask(BaseTask):
     command = []
     proc = None
 
-    def gene(self):
+    def current_task(self):
         import subprocess
-        for t in super(BaseCommandTask, self).gene():
-            yield t
         self.proc = subprocess.Popen(
             self.command,
             stdout=subprocess.PIPE,
@@ -98,7 +113,7 @@ class GitModuleUpdate(BaseGitModuleTask):
     subcommand = 'update'
 
 
-class BaseModuleTask(BaseBlockingTask):
+class BaseModuleTask(BaseTask):
 
     reponame = None
     parents = [GitModuleInit, GitModuleUpdate]
@@ -109,14 +124,13 @@ class BaseModuleTask(BaseBlockingTask):
         self.pconfig = {GitModuleInit: config, GitModuleUpdate: config}
         if os.path.isdir(os.path.join(self.cwd, self.reponame, '.git')):
             self.done = True
+            print "{0} is ready".format(self.reponame)
 
-    def start(self):
+    def on_start(self):
         if not self.done:
             print "Preparing {0}".format(self.reponame)
-        return super(BaseModuleTask, self).start()
 
-    def wait(self):
-        super(BaseModuleTask, self).wait()
+    def on_close(self):
         print "Preparing {0}... Done".format(self.reponame)
 
 
@@ -141,9 +155,8 @@ class ZeroEINTask(BaseCommandTask):
     def __init__(self, command):
         self.command = command
 
-    def start(self):
+    def on_start(self):
         print "Starting Emacs..."
-        return super(ZeroEINTask, self).start()
 
 
 def zeroein(emacs):
