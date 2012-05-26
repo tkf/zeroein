@@ -25,6 +25,8 @@
 
 ;;; Code:
 
+
+;;; load-path configurations
 (defvar zeroein:root-dir
   (or (if load-file-name (file-name-directory load-file-name))
       default-directory))
@@ -41,11 +43,11 @@
 
 (load (zeroein:path "nxhtml" "autostart.el"))
 
-(require 'ein)
-
 
 ;;; Configurations
 (eval-when-compile (require 'ein-notebooklist))
+(require 'ein)
+
 (setq ein:use-auto-complete-superpack t)
 ;; (setq ein:use-smartrep t)
 
