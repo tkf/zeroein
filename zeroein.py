@@ -34,6 +34,7 @@ class BaseTask(object):
                 else:
                     nexttasks.append(t)
             ptasks = nexttasks
+        self.on_current_task()
         for t in self.current_task():
             yield t
         self.on_close()
@@ -53,6 +54,9 @@ class BaseTask(object):
             pass
 
     def on_start(self):
+        pass
+
+    def on_current_task(self):
         pass
 
     def on_close(self):
@@ -155,7 +159,7 @@ class ZeroEINTask(BaseCommandTask):
     def __init__(self, command):
         self.command = command
 
-    def on_start(self):
+    def on_current_task(self):
         print "Starting Emacs..."
 
 
