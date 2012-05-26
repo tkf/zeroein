@@ -19,11 +19,15 @@ class BaseTask(object):
         self.start()
         self.wait()
 
+    def iter_parents(self):
+        for p in self.parents:
+            yield p(**self.pconfig.get(p, {}))
+
     def gene(self):
         self.on_start()
         ptasks = []
-        for p in self.parents:
-            ptasks.append(p(**self.pconfig.get(p, {})).start())
+        for t in self.iter_parents():
+            ptasks.append(t.start())
         while ptasks:
             nexttasks = []
             for t in ptasks:
@@ -67,8 +71,7 @@ class BaseBlockingTask(BaseTask):
 
     def gene(self):
         self.on_start()
-        for p in self.parents:
-            t = p(**self.pconfig.get(p, {}))
+        for t in self.iter_parents():
             t.start()
             t.wait()
             yield t
