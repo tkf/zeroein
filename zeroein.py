@@ -37,6 +37,8 @@ class BaseTask(object):
 class BaseBlockingTask(BaseTask):
 
     def start(self):
+        if self.done:
+            return
         for p in self.parents:
             t = p(**self.pconfig.get(p, {}))
             t.start()
@@ -98,6 +100,15 @@ class BaseModuleTask(BaseBlockingTask):
         if os.path.isdir(os.path.join(self.cwd, self.reponame, '.git')):
             self.done = True
 
+    def start(self):
+        if not self.done:
+            print "Preparing {0}".format(self.reponame)
+        super(BaseModuleTask, self).start()
+
+    def wait(self):
+        super(BaseModuleTask, self).wait()
+        print "Preparing {0}... Done".format(self.reponame)
+
 
 def make_module_task(_reponame):
     class Task(BaseModuleTask):
@@ -119,6 +130,10 @@ class ZeroEINTask(BaseCommandTask):
 
     def __init__(self, command):
         self.command = command
+
+    def start(self):
+        super(ZeroEINTask, self).start()
+        print "Starting Emacs..."
 
 
 def zeroein(emacs):
