@@ -19,30 +19,41 @@ class BaseTask(object):
         self.start()
         self.wait()
 
+    def gene(self):
+        ptasks = []
+        for p in self.parents:
+            ptasks.append(p(**self.pconfig.get(p, {})).start())
+        while ptasks:
+            nexttasks = []
+            for t in ptasks:
+                try:
+                    yield t.next()
+                except StopIteration:
+                    pass
+                else:
+                    nexttasks.append(t)
+            ptasks = nexttasks
+
     def start(self):
         if self.done:
-            return
-        tasks = []
-        for p in self.parents:
-            tasks.append(p(**self.pconfig.get(p, {})))
-        for t in tasks:
-            t.start()
-        for t in tasks:
-            t.wait()
+            self.tasks = iter([])
+        else:
+            self.tasks = self.gene()
+        return self.tasks
 
     def wait(self):
-        pass
+        for t in self.tasks:
+            pass
 
 
 class BaseBlockingTask(BaseTask):
 
-    def start(self):
-        if self.done:
-            return
+    def gene(self):
         for p in self.parents:
             t = p(**self.pconfig.get(p, {}))
             t.start()
             t.wait()
+            yield t
 
 
 class BaseCommandTask(BaseTask):
@@ -50,22 +61,21 @@ class BaseCommandTask(BaseTask):
     command = []
     proc = None
 
-    def start(self):
+    def gene(self):
         import subprocess
-        super(BaseCommandTask, self).start()
+        for t in super(BaseCommandTask, self).gene():
+            yield t
         self.proc = subprocess.Popen(
             self.command,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             cwd=self.cwd or None)
-
-    def wait(self):
-        if self.proc:
-            if self.proc.wait() != 0:
-                print self.proc.stdout.read()
-                print self.proc.stderr.read()
-                raise RuntimeError("An error occurred while running {0}"
-                                   .format(self.command))
+        yield self.proc
+        if self.proc.wait() != 0:
+            print self.proc.stdout.read()
+            print self.proc.stderr.read()
+            raise RuntimeError("An error occurred while running {0}"
+                               .format(self.command))
 
 
 class BaseGitModuleTask(BaseCommandTask):
@@ -103,7 +113,7 @@ class BaseModuleTask(BaseBlockingTask):
     def start(self):
         if not self.done:
             print "Preparing {0}".format(self.reponame)
-        super(BaseModuleTask, self).start()
+        return super(BaseModuleTask, self).start()
 
     def wait(self):
         super(BaseModuleTask, self).wait()
@@ -132,14 +142,14 @@ class ZeroEINTask(BaseCommandTask):
         self.command = command
 
     def start(self):
-        super(ZeroEINTask, self).start()
         print "Starting Emacs..."
+        return super(ZeroEINTask, self).start()
 
 
 def zeroein(emacs):
     elisp = os.path.join(ZEROEIN_ROOT, 'zeroein.el')
     task = ZeroEINTask([emacs, '-Q', '-l', elisp])
-    task.start()
+    task.run()
 
 
 def main():
