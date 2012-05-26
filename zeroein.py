@@ -67,6 +67,15 @@ class BaseTask(object):
         pass
 
 
+class BaseListConfigTask(BaseTask):
+
+    def iter_parents(self):
+        import itertools
+        pconfig = itertools.chain(self.pconfig, itertools.repeat({}))
+        for (p, c) in zip(self.parents, pconfig):
+            yield p(**c)
+
+
 class BaseBlockingTask(BaseTask):
 
     def gene(self):
@@ -120,13 +129,13 @@ class GitModuleUpdate(BaseGitModuleTask):
     subcommand = 'update'
 
 
-class BaseModuleTask(BaseTask):
+class ModuleTask(BaseTask):
 
-    reponame = None
     parents = [GitModuleInit, GitModuleUpdate]
 
-    def __init__(self):
-        super(BaseModuleTask, self).__init__()
+    def __init__(self, reponame):
+        super(ModuleTask, self).__init__()
+        self.reponame = reponame
         config = {'reponame': self.reponame}
         self.pconfig = {GitModuleInit: config, GitModuleUpdate: config}
         if os.path.isdir(os.path.join(self.cwd, self.reponame, '.git')):
@@ -141,18 +150,13 @@ class BaseModuleTask(BaseTask):
         print "Preparing {0}... Done".format(self.reponame)
 
 
-def make_module_task(_reponame):
-    class Task(BaseModuleTask):
-        reponame = _reponame
-    return Task
+class PrepareModulesTask(BaseListConfigTask):
 
-
-class PrepareModulesTask(BaseTask):
-
-    parents = map(
-        make_module_task,
+    pconfig = map(
+        lambda x: {'reponame': x},
         ["fuzzy", "pos-tip", "smartrep", "auto-complete", "python",
          "websocket", "markdown-mode", "nxhtml", "popup", "ein"])
+    parents = [ModuleTask] * len(pconfig)
 
 
 class ZeroEINTask(BaseCommandTask):
