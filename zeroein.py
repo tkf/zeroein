@@ -162,6 +162,7 @@ class PrepareModulesTask(BaseListConfigTask):
 class ZeroEINTask(BaseCommandTask):
 
     parents = [PrepareModulesTask]
+    cwd = None
 
     def __init__(self, command):
         self.command = command
