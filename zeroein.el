@@ -42,7 +42,6 @@
 (load (zeroein:path "nxhtml" "autostart.el"))
 
 (require 'ein)
-(ein:notebooklist-open)
 
 
 ;;; Configurations

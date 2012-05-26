@@ -172,7 +172,8 @@ class ZeroEINTask(BaseCommandTask):
 
 def zeroein(emacs):
     elisp = os.path.join(ZEROEIN_ROOT, 'zeroein.el')
-    task = ZeroEINTask([emacs, '-Q', '-l', elisp])
+    command = [emacs, '-Q', '-l', elisp, '-f', 'ein:notebooklist-open']
+    task = ZeroEINTask(command)
     task.run()
 
 
