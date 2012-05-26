@@ -44,6 +44,21 @@
 (require 'ein)
 (ein:notebooklist-open)
 
+
+;;; Configurations
+(eval-when-compile (require 'ein-notebooklist))
+(setq ein:use-auto-complete-superpack t)
+;; (setq ein:use-smartrep t)
+
+(custom-set-faces
+   '(mumamo-background-chunk-major
+     ((((class color) (min-colors 88) (background dark)) nil)))
+   ;; '(mumamo-background-chunk-submode1
+   ;;   ((((class color) (min-colors 88) (background dark)) nil)))
+   )
+
+
+;;; Workaround
 
 ;; Suppress this warning when using mumamo:
 ;; Warning: `font-lock-syntactic-keywords' is an obsolete variable (as of 24.1);
