@@ -5,6 +5,8 @@ Run EIN test suite
 """
 
 import os
+import glob
+
 ZEROEIN_ROOT = os.path.dirname(__file__)
 ZEROEIN_EL = os.path.join(ZEROEIN_ROOT, 'zeroein.el')
 
@@ -19,8 +21,12 @@ def zeroeindir(*path):
     return os.path.join(ZEROEIN_ROOT, *path)
 
 
+def eindir(*path):
+    return zeroeindir('ein', *path)
+
+
 def testdir(*path):
-    return zeroeindir('ein', 'tests', *path)
+    return eindir('tests', *path)
 
 
 class TestRunner(object):
@@ -65,7 +71,15 @@ class TestRunner(object):
         return self.report()
 
 
-def run_ein_test(unit_test, func_test, **kwds):
+def remove_elc():
+    files = glob.glob(eindir("*.elc")) + glob.glob(testdir("*.elc"))
+    map(os.remove, files)
+    print "Removed {0} elc files".format(len(files))
+
+
+def run_ein_test(unit_test, func_test, clean_elc, **kwds):
+    if clean_elc:
+        remove_elc()
     if unit_test:
         unit_test_runner = TestRunner(testfile='test-load.el', **kwds)
         if unit_test_runner.run() != 0:
@@ -91,6 +105,8 @@ def main():
                         dest='func_test', action='store_false')
     parser.add_argument('--no-unit-test', '-U', default=True,
                         dest='unit_test', action='store_false')
+    parser.add_argument('--clean-elc', '-c', default=False,
+                        action='store_true')
     args = parser.parse_args()
     sys.exit(run_ein_test(**vars(args)))
 
