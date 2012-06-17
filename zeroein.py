@@ -129,7 +129,7 @@ class GitModuleUpdate(BaseGitModuleTask):
     subcommand = 'update'
 
 
-class ModuleTask(BaseTask):
+class ModuleTask(BaseBlockingTask):
 
     parents = [GitModuleInit, GitModuleUpdate]
 
