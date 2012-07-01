@@ -48,9 +48,18 @@
 (eval-when-compile (require 'ein-notebooklist))
 (require 'ein)
 
+;; auto-complete
 (setq ein:use-auto-complete-superpack t)
 ;; (setq ein:use-smartrep t)
 
+(require 'auto-complete-config nil t)
+(when (featurep 'auto-complete-config)
+  (ac-config-default)
+  (add-to-list 'ac-dictionary-directories
+               (zeroein:path "auto-complete" "dict"))
+  (global-auto-complete-mode t))
+
+;; MuMaMo
 (custom-set-faces
    '(mumamo-background-chunk-major
      ((((class color) (min-colors 88) (background dark)) nil)))
