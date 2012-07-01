@@ -5,6 +5,7 @@ Zero setup Emacs IPython Notebook client
 """
 
 import os
+import argparse
 ZEROEIN_ROOT = os.path.dirname(__file__)
 
 
@@ -171,18 +172,37 @@ class ZeroEINTask(BaseCommandTask):
         print "Starting Emacs..."
 
 
-def zeroein(emacs):
+def zeroein(emacs, url_or_port):
     elisp = os.path.join(ZEROEIN_ROOT, 'zeroein.el')
-    command = [emacs, '-Q', '-l', elisp, '-f', 'ein:notebooklist-open']
+    command = [emacs, '-Q', '-l', elisp,
+               '--eval', setq_url_or_port(url_or_port),
+               '-f', 'ein:notebooklist-open']
     task = ZeroEINTask(command)
     task.run()
 
 
+def setq_url_or_port(url_or_port):
+    if isinstance(url_or_port, basestring):
+        url_or_port = '"{0}"'.format(url_or_port)
+    return '(setq ein:default-url-or-port {0})'.format(url_or_port)
+
+
+def type_url_or_port(string):
+    if string.isdigit():
+        return int(string)
+    elif string.startswith("http"):
+        return string
+    else:
+        argparse.ArgumentTypeError("{0!r} is not URL or port.")
+
+
 def main():
-    from argparse import ArgumentParser
-    parser = ArgumentParser(description=__doc__.split()[1])
+    parser = argparse.ArgumentParser(description=__doc__.split()[1])
     parser.add_argument('--emacs', '-e', default='emacs',
                         help='Emacs executable.')
+    parser.add_argument('--url-or-port', '-p', default=8888,
+                        help='Default IPython server URL or port.',
+                        type=type_url_or_port)
     args = parser.parse_args()
     zeroein(**vars(args))
 
