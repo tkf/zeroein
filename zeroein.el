@@ -38,7 +38,7 @@
     (concat zeroein:root-dir p)))
 
 (mapc (lambda (path) (add-to-list 'load-path (zeroein:path path)))
-      '("ein" "markdown-mode" "websocket" "python" "auto-complete"
+      '("ein/lisp" "markdown-mode" "websocket" "python" "auto-complete"
         "popup" "fuzzy" "pos-tip" "smartrep"))
 
 (load (zeroein:path "nxhtml" "autostart.el"))
