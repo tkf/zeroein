@@ -41,7 +41,7 @@ class TestRunner(object):
             command.append('-batch')
         if self.debug_on_error:
             command.extend(['-f', 'toggle-debug-on-error'])
-        command.extend(['-L', zeroeindir('ein'),
+        command.extend(['-L', zeroeindir('ein', 'lisp'),
                         '-L', zeroeindir('websocket'),
                         '-L', testdir(),
                         '-l', testdir(self.testfile)])
