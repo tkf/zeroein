@@ -41,6 +41,10 @@ class TestRunner(object):
             command.append('-batch')
         if self.debug_on_error:
             command.extend(['-f', 'toggle-debug-on-error'])
+        for path in self.load_path:
+            command.extend(['-L', path])
+        for path in self.load:
+            command.extend(['-l', path])
         command.extend(['-L', zeroeindir('ein', 'lisp'),
                         '-L', zeroeindir('websocket'),
                         '-L', testdir(),
@@ -94,9 +98,15 @@ def run_ein_test(unit_test, func_test, clean_elc, **kwds):
 def main():
     import sys
     from argparse import ArgumentParser
-    parser = ArgumentParser(description=__doc__.split()[1])
+    parser = ArgumentParser(description=__doc__.splitlines()[1])
     parser.add_argument('--emacs', '-e', default='emacs',
                         help='Emacs executable.')
+    parser.add_argument('--load-path', '-L', default=[], action='append',
+                        help="add a directory to load-path. "
+                        "can be specified multiple times.")
+    parser.add_argument('--load', '-l', default=[], action='append',
+                        help="load lisp file before tests. "
+                        "can be specified multiple times.")
     parser.add_argument('--no-batch', '-B', default=True,
                         dest='batch', action='store_false')
     parser.add_argument('--debug-on-error', '-d', default=False,
