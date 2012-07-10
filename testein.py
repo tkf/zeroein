@@ -113,17 +113,25 @@ def main():
                         "can be specified multiple times.")
     parser.add_argument('--load-ert', default=False, action='store_true',
                         help="load ERT from git submodule. "
-                        "you need to update the module manually.")
+                        "you need to update git submodule manually "
+                        "if ert/ directory does not exist yet.")
     parser.add_argument('--no-batch', '-B', default=True,
-                        dest='batch', action='store_false')
+                        dest='batch', action='store_false',
+                        help="start interactive session.")
     parser.add_argument('--debug-on-error', '-d', default=False,
-                        action='store_true')
+                        action='store_true',
+                        help="set debug-on-error to t and start "
+                        "interactive session.")
     parser.add_argument('--no-func-test', '-F', default=True,
-                        dest='func_test', action='store_false')
+                        dest='func_test', action='store_false',
+                        help="do not run functional test.")
     parser.add_argument('--no-unit-test', '-U', default=True,
-                        dest='unit_test', action='store_false')
+                        dest='unit_test', action='store_false',
+                        help="do not run unit test.")
     parser.add_argument('--clean-elc', '-c', default=False,
-                        action='store_true')
+                        action='store_true',
+                        help="remove *.elc files in ein/lisp and "
+                        "ein/tests directories.")
     args = parser.parse_args()
     sys.exit(run_ein_test(**vars(args)))
 
