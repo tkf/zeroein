@@ -28,3 +28,6 @@
 [submodule "ein"]
 	path = ein
 	url = git://github.com/tkf/emacs-ipython-notebook.git
+[submodule "ert"]
+	path = ert
+	url = git://github.com/ohler/ert.git
