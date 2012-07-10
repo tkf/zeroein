@@ -41,10 +41,15 @@ class TestRunner(object):
             command.append('-batch')
         if self.debug_on_error:
             command.extend(['-f', 'toggle-debug-on-error'])
+
+        # load modules
         if self.load_ert:
             ertdir = zeroeindir('ert', 'lisp', 'emacs-lisp')
             command.extend(
                 ['-L', ertdir, '-l', os.path.join(ertdir, 'ert-batch.el')])
+            # ert-run-tests-batch-and-exit is defined in ert-batch.el
+            # and it is not loaded via ert.el.  So, I need to load it
+            # manually.
         for path in self.load_path:
             command.extend(['-L', path])
         for path in self.load:
@@ -53,6 +58,8 @@ class TestRunner(object):
                         '-L', zeroeindir('websocket'),
                         '-L', eintestdir(),
                         '-l', eintestdir(self.testfile)])
+
+        # do the test
         if batch:
             command.extend(['-f', 'ert-run-tests-batch-and-exit'])
         else:
