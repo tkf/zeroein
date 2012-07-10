@@ -21,11 +21,11 @@ def zeroeindir(*path):
     return os.path.join(ZEROEIN_ROOT, *path)
 
 
-def eindir(*path):
+def einlispdir(*path):
     return zeroeindir('ein', 'lisp', *path)
 
 
-def testdir(*path):
+def eintestdir(*path):
     return zeroeindir('ein', 'tests', *path)
 
 
@@ -49,10 +49,10 @@ class TestRunner(object):
             command.extend(['-L', path])
         for path in self.load:
             command.extend(['-l', path])
-        command.extend(['-L', eindir(),
+        command.extend(['-L', einlispdir(),
                         '-L', zeroeindir('websocket'),
-                        '-L', testdir(),
-                        '-l', testdir(self.testfile)])
+                        '-L', eintestdir(),
+                        '-l', eintestdir(self.testfile)])
         if batch:
             command.extend(['-f', 'ert-run-tests-batch-and-exit'])
         else:
@@ -80,7 +80,7 @@ class TestRunner(object):
 
 
 def remove_elc():
-    files = glob.glob(eindir("*.elc")) + glob.glob(testdir("*.elc"))
+    files = glob.glob(einlispdir("*.elc")) + glob.glob(eintestdir("*.elc"))
     map(os.remove, files)
     print "Removed {0} elc files".format(len(files))
 
