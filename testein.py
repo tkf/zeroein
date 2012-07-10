@@ -41,6 +41,10 @@ class TestRunner(object):
             command.append('-batch')
         if self.debug_on_error:
             command.extend(['-f', 'toggle-debug-on-error'])
+        if self.load_ert:
+            ertdir = zeroeindir('ert', 'lisp', 'emacs-lisp')
+            command.extend(
+                ['-L', ertdir, '-l', os.path.join(ertdir, 'ert-batch.el')])
         for path in self.load_path:
             command.extend(['-L', path])
         for path in self.load:
@@ -107,6 +111,9 @@ def main():
     parser.add_argument('--load', '-l', default=[], action='append',
                         help="load lisp file before tests. "
                         "can be specified multiple times.")
+    parser.add_argument('--load-ert', default=False, action='store_true',
+                        help="load ERT from git submodule. "
+                        "you need to update the module manually.")
     parser.add_argument('--no-batch', '-B', default=True,
                         dest='batch', action='store_false')
     parser.add_argument('--debug-on-error', '-d', default=False,
