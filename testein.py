@@ -22,11 +22,11 @@ def zeroeindir(*path):
 
 
 def eindir(*path):
-    return zeroeindir('ein', *path)
+    return zeroeindir('ein', 'lisp', *path)
 
 
 def testdir(*path):
-    return eindir('tests', *path)
+    return zeroeindir('ein', 'tests', *path)
 
 
 class TestRunner(object):
@@ -49,7 +49,7 @@ class TestRunner(object):
             command.extend(['-L', path])
         for path in self.load:
             command.extend(['-l', path])
-        command.extend(['-L', zeroeindir('ein', 'lisp'),
+        command.extend(['-L', eindir(),
                         '-L', zeroeindir('websocket'),
                         '-L', testdir(),
                         '-l', testdir(self.testfile)])
