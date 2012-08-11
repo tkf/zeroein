@@ -56,6 +56,8 @@ class TestRunner(object):
             command.extend(['-l', path])
         command.extend(['-L', einlispdir(),
                         '-L', zeroeindir('websocket'),
+                        '-L', zeroeindir('auto-complete'),
+                        '-L', zeroeindir('popup'),
                         '-L', eintestdir(),
                         '-l', eintestdir(self.testfile)])
 
