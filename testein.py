@@ -49,6 +49,8 @@ class TestRunner(object):
             'ein:log-level': self.ein_log_level,
             'ein:log-message-level': self.ein_message_level,
         }
+        if self.ein_debug:
+            self.lispvars['ein:debug'] = "'t"
 
     def bind_lispvars(self):
         command = []
@@ -190,6 +192,8 @@ def main():
                         help="Print commands to be executed.")
     parser.add_argument('--ein-log-level')
     parser.add_argument('--ein-message-level')
+    parser.add_argument('--ein-debug', default=False, action='store_true',
+                        help="(setq ein:debug t) when given.")
     args = parser.parse_args()
     sys.exit(run_ein_test(**vars(args)))
 
