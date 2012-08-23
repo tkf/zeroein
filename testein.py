@@ -34,8 +34,25 @@ class TestRunner(object):
     def __init__(self, **kwds):
         self.__dict__.update(kwds)
 
+        self.emacsname = os.path.basename(self.emacs)
+        self.testname = os.path.splitext(self.testfile)[0]
+        self.lispvars = {
+            'ein:testing-dump-file-log':
+            '{testname}_log_{emacsname}.log'.format(**self.__dict__),
+            'ein:testing-dump-file-messages':
+            '{testname}_messages_{emacsname}.log'.format(**self.__dict__),
+        }
+
+    def bind_lispvars(self):
+        command = []
+        for (k, v) in self.lispvars.iteritems():
+            command.extend([
+                '--eval', '(setq {0} "{1}")'.format(k, v)])
+        return command
+
     def command(self):
-        command = [self.emacs, '-Q']
+        command = [self.emacs, '-Q'] + self.bind_lispvars()
+
         batch = self.batch and not self.debug_on_error
         if batch:
             command.append('-batch')
