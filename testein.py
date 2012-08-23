@@ -45,11 +45,13 @@ class TestRunner(object):
         # load modules
         if self.load_ert:
             ertdir = zeroeindir('ert', 'lisp', 'emacs-lisp')
-            command.extend(
-                ['-L', ertdir, '-l', os.path.join(ertdir, 'ert-batch.el')])
-            # ert-run-tests-batch-and-exit is defined in ert-batch.el
-            # and it is not loaded via ert.el.  So, I need to load it
-            # manually.
+            command.extend([
+                '-L', ertdir,
+                # Load `ert-run-tests-batch-and-exit`:
+                '-l', os.path.join(ertdir, 'ert-batch.el'),
+                # Load `ert-run-tests-interactively`:
+                '-l', os.path.join(ertdir, 'ert-ui.el'),
+             ])
         for path in self.load_path:
             command.extend(['-L', path])
         for path in self.load:
