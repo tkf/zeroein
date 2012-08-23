@@ -117,19 +117,33 @@ def remove_elc():
     print "Removed {0} elc files".format(len(files))
 
 
+def construct_command(args):
+    """
+    Construct command as a string given a list of arguments.
+    """
+    command = []
+    escapes = set(' ()')
+    for a in args:
+        if set(a) & escapes:
+            command.append(repr(str(a)))  # hackish way to escape
+        else:
+            command.append(a)
+    return " ".join(command)
+
+
 def run_ein_test(unit_test, func_test, clean_elc, dry_run, **kwds):
     if clean_elc and not dry_run:
         remove_elc()
     if unit_test:
         unit_test_runner = TestRunner(testfile='test-load.el', **kwds)
         if dry_run:
-            print " ".join(unit_test_runner.command())
+            print construct_command(unit_test_runner.command())
         elif unit_test_runner.run() != 0:
             return 1
     if func_test:
         func_test_runner = TestRunner(testfile='func-test.el', **kwds)
         if dry_run:
-            print " ".join(func_test_runner.command())
+            print construct_command(func_test_runner.command())
         elif func_test_runner.run() != 0:
             return 1
     return 0
