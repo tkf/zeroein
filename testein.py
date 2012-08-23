@@ -190,8 +190,8 @@ def main():
     parser.add_argument('--dry-run', default=False,
                         action='store_true',
                         help="Print commands to be executed.")
-    parser.add_argument('--ein-log-level')
-    parser.add_argument('--ein-message-level')
+    parser.add_argument('--ein-log-level', default=40)
+    parser.add_argument('--ein-message-level', default=30)
     parser.add_argument('--ein-debug', default=False, action='store_true',
                         help="(setq ein:debug t) when given.")
     args = parser.parse_args()
