@@ -96,16 +96,20 @@ def remove_elc():
     print "Removed {0} elc files".format(len(files))
 
 
-def run_ein_test(unit_test, func_test, clean_elc, **kwds):
-    if clean_elc:
+def run_ein_test(unit_test, func_test, clean_elc, dry_run, **kwds):
+    if clean_elc and not dry_run:
         remove_elc()
     if unit_test:
         unit_test_runner = TestRunner(testfile='test-load.el', **kwds)
-        if unit_test_runner.run() != 0:
+        if dry_run:
+            print " ".join(unit_test_runner.command())
+        elif unit_test_runner.run() != 0:
             return 1
     if func_test:
         func_test_runner = TestRunner(testfile='func-test.el', **kwds)
-        if func_test_runner.run() != 0:
+        if dry_run:
+            print " ".join(func_test_runner.command())
+        elif func_test_runner.run() != 0:
             return 1
     return 0
 
@@ -143,6 +147,9 @@ def main():
                         action='store_true',
                         help="remove *.elc files in ein/lisp and "
                         "ein/tests directories.")
+    parser.add_argument('--dry-run', default=False,
+                        action='store_true',
+                        help="Print commands to be executed.")
     args = parser.parse_args()
     sys.exit(run_ein_test(**vars(args)))
 
