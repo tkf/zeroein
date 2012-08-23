@@ -41,18 +41,21 @@ class TestRunner(object):
             testname=os.path.splitext(self.testfile)[0],
             modename='batch' if self.batch else 'interactive',
         )
+        logtemp = '"{testname}_log_{modename}_{emacsname}.log"'
+        msgtemp = '"{testname}_messages_{modename}_{emacsname}.log"'
         self.lispvars = {
-            'ein:testing-dump-file-log':
-            '{testname}_log_{modename}_{emacsname}.log'.format(**fmtdata),
-            'ein:testing-dump-file-messages':
-            '{testname}_messages_{modename}_{emacsname}.log'.format(**fmtdata),
+            'ein:testing-dump-file-log': logtemp.format(**fmtdata),
+            'ein:testing-dump-file-messages': msgtemp.format(**fmtdata),
+            'ein:log-level': self.ein_log_level,
+            'ein:log-message-level': self.ein_message_level,
         }
 
     def bind_lispvars(self):
         command = []
         for (k, v) in self.lispvars.iteritems():
-            command.extend([
-                '--eval', '(setq {0} "{1}")'.format(k, v)])
+            if v is not None:
+                command.extend([
+                    '--eval', '(setq {0} {1})'.format(k, v)])
         return command
 
     def command(self):
@@ -185,6 +188,8 @@ def main():
     parser.add_argument('--dry-run', default=False,
                         action='store_true',
                         help="Print commands to be executed.")
+    parser.add_argument('--ein-log-level')
+    parser.add_argument('--ein-message-level')
     args = parser.parse_args()
     sys.exit(run_ein_test(**vars(args)))
 
