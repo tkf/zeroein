@@ -33,14 +33,19 @@ class TestRunner(object):
 
     def __init__(self, **kwds):
         self.__dict__.update(kwds)
+        self.batch = self.batch and not self.debug_on_error
 
-        self.emacsname = os.path.basename(self.emacs)
-        self.testname = os.path.splitext(self.testfile)[0]
+        fmtdata = self.__dict__.copy()
+        fmtdata.update(
+            emacsname=os.path.basename(self.emacs),
+            testname=os.path.splitext(self.testfile)[0],
+            modename='batch' if self.batch else 'interactive',
+        )
         self.lispvars = {
             'ein:testing-dump-file-log':
-            '{testname}_log_{emacsname}.log'.format(**self.__dict__),
+            '{testname}_log_{modename}_{emacsname}.log'.format(**fmtdata),
             'ein:testing-dump-file-messages':
-            '{testname}_messages_{emacsname}.log'.format(**self.__dict__),
+            '{testname}_messages_{modename}_{emacsname}.log'.format(**fmtdata),
         }
 
     def bind_lispvars(self):
@@ -53,8 +58,7 @@ class TestRunner(object):
     def command(self):
         command = [self.emacs, '-Q'] + self.bind_lispvars()
 
-        batch = self.batch and not self.debug_on_error
-        if batch:
+        if self.batch:
             command.append('-batch')
         if self.debug_on_error:
             command.extend(['-f', 'toggle-debug-on-error'])
@@ -81,7 +85,7 @@ class TestRunner(object):
                         '-l', eintestdir(self.testfile)])
 
         # do the test
-        if batch:
+        if self.batch:
             command.extend(['-f', 'ert-run-tests-batch-and-exit'])
         else:
             command.extend(['--eval', "(ert 't)"])
