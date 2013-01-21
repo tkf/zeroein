@@ -2,10 +2,7 @@
  Zero setup Emacs IPython Notebook client
 ==========================================
 
-You can start `Emacs IPython Notebook client`_ with only two commands::
+zeoroein is merged to EIN_.
 
-   git clone git://github.com/tkf/zeroein.git
-   zeroein/zeroein.py
-
-.. _`Emacs IPython Notebook client`:
+.. _EIN:
    https://github.com/tkf/emacs-ipython-notebook
